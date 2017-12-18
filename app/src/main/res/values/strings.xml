@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Project S</string>
+    <string name="edit_message">Enter Message</string>
+    <string name="button_send">Send</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="string_now_jp">今何時ですか</string>
+    <string name="en">English</string>
+
+    <!-- Review Summary -->
+    <string name="review_summary_num_correct" formatted="false">#Corr: %1$d</string>
+    <string name="review_summary_num_incorrect" formatted="false">#Incorr: %1$d</string>
+    <string name="review_summary_per_correct" formatted="false">%1$d%% Corr</string>
+    <string name="review_summary_total" formatted="false">#Tot: %1$d</string>
+    <string name="wanikani_api_key" formatted="false">API Key (v2): %1$s</string>
+    <string name="review_summary_correct">Correct</string>
+    <string name="review_summary_incorrect">Incorrect</string>
+</resources>
