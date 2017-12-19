@@ -97,27 +97,26 @@ public class WaniKaniAccount implements Serializable {
         /** Cull id list */
         Card[] cachedReviewCards = getCachedCards(ids);
         ids = cullIdList(ids);
+        StringBuilder builder = new StringBuilder();
+        for(String s : ids) {
+            builder.append(s + ',');
+        }
+        String culledIds = builder.toString();
+        culledIds = culledIds.substring(0, culledIds.length()-1);
         /** Get new subject data */
         ArrayList<Card> newReviewCards = new ArrayList<>();
-        for (int i = 0; i < ids.length; i++) {
-            String subjectData = WaniKaniAPI.getSubjectData(this.API_KEY_V2, ids[i]);
-            /** Convert data into cards */
-            Card newReviewCard = WaniKaniAPI.extractCardFromData(subjectData);
-            if (newReviewCard != null) {
-                newReviewCards.add(newReviewCard);
-            }
-        }
-        Card[] newReviewCardsA = newReviewCards.toArray(new Card[newReviewCards.size()]);
+        String subjectData = WaniKaniAPI.getSubjectData(this.API_KEY_V2, culledIds);
+        Card[] newCards = WaniKaniAPI.extractCardsFromData(subjectData);
         /** Cache new cards */
         try {
-            cacheCard(ids, newReviewCardsA);
+            cacheCard(ids, newCards);
         } catch (Exception e) {
             // This will occur when the cards we get from reviews don't match the number of ids we give
             // Will only happen when radicals that don't have unicode appear
             e.printStackTrace();
         }
         /** Add cards to cardset */
-        reviewSet.addCard(newReviewCardsA);
+        reviewSet.addCard(newCards);
         reviewSet.addCard(cachedReviewCards);
 
         return reviewSet;

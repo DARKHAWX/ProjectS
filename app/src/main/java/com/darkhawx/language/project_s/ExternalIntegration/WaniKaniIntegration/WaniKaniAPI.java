@@ -229,7 +229,7 @@ class RetrieveWaniKaniSubject extends AsyncTask<String, Void, String> {
                 e.printStackTrace();
             }
         }
-        String url = "https://www.wanikani.com/api/v2/subjects/";
+        String url = "https://www.wanikani.com/api/v2/subjects/?ids=";
         String charset = "UTF-8";
         String query = params[1];
 
