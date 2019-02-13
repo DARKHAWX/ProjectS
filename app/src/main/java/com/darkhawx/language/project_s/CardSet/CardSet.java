@@ -1,5 +1,6 @@
 package com.darkhawx.language.project_s.CardSet;
 
+import android.util.Log;
 import android.widget.ProgressBar;
 
 import com.darkhawx.language.project_s.Constants;
@@ -8,6 +9,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -21,7 +25,7 @@ public class CardSet implements Serializable {
     private String displayName;
 
     public Language lang;
-    private List<Card> cards;
+    protected HashMap<Integer, Card> cards;
 
     private int currentIndex;
 
@@ -29,10 +33,11 @@ public class CardSet implements Serializable {
         this.lang = lang;
         this.displayName = displayName;
 
-        this.cards = new ArrayList<>();
+        this.cards = new HashMap<Integer, Card>();
+
 
         for (int i = 0; i < cards.length; i++) {
-            this.cards.add(cards[i]);
+            this.cards.put(i, cards[i]);
         }
 
         this.currentIndex = -1;
@@ -45,23 +50,42 @@ public class CardSet implements Serializable {
     }
 
     public boolean addCard(Card card) {
-        if (!this.cards.contains(card)) {
-            this.cards.add(card);
+        if (!this.cards.containsValue(card)) {
+            this.cards.put(cards.size(), card);
             return true;
         }
         return false;
     }
 
-    public void addCard(Card[] card) {
+    public boolean addCard(Card card, int id) {
+        if (!this.cards.containsKey(id)) {
+            this.cards.put(cards.size(), card);
+            return true;
+        }
+        return false;
+    }
+
+    public void addCard(Card[] cards) {
+        for (int i = 0; i < cards.length; i++) {
+            Card card = cards[i];
+            int id = card.waniKaniID;
+
+            if ((id != -1 && !this.cards.containsValue(id)) || !this.cards.containsValue(card)) {
+                this.cards.put(id == -1 ? this.cards.size() : id, card);
+            }
+        }
+    }
+
+    public void addCard(Card[] card, int[] id) {
         for (int i = 0; i < card.length; i++) {
-            if (!this.cards.contains(card[i])) {
-                this.cards.add(card[i]);
+            if (!this.cards.containsKey(id[i])) {
+                this.cards.put(cards.size(), card[i]);
             }
         }
     }
 
     public boolean removeCard(Card card) {
-        if (this.cards.contains(card)) {
+        if (this.cards.containsValue(card)) {
             this.cards.remove(card);
             return true;
         }
@@ -69,7 +93,7 @@ public class CardSet implements Serializable {
     }
 
     public boolean checkCard(Card card) {
-        return this.cards.contains(card);
+        return this.cards.containsValue(card);
     }
 
     public int numCards() {

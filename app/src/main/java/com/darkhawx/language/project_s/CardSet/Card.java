@@ -15,11 +15,15 @@ public abstract class Card implements Serializable {
     protected CardStats stats;
     protected CardType type;
 
+    // Used only by the waniKani set
+    protected int waniKaniID;
+
     protected String displayText;
 
     public Card(String displayText) {
         this.displayText = displayText;
         this.stats = new CardStats();
+        this.waniKaniID = -1;
     }
 
     public void correct() {
@@ -42,6 +46,10 @@ public abstract class Card implements Serializable {
 
     public boolean equals(Card other) {
         return this.type == other.type && this.displayText.compareTo(other.displayText) == 0;
+    }
+
+    public void setWaniKaniID(int id) {
+        this.waniKaniID = id;
     }
 
     public static ArrayList<String> toStringList(List<Card> cards) {

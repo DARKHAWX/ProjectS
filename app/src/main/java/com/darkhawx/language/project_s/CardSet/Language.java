@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 
 public enum Language implements Serializable {
-    ENGLISH("en", "English", "Letter"), JAPANESE("jp", "Japanese", "Kanji", "Radical");
+    ENGLISH("en", "English", "Letter"), JAPANESE("jp", "Japanese", "Kanji", "Radical", "Vocabulary");
 
     private final String code;
     private final String dispName;

@@ -29,8 +29,8 @@ public class ViewCardActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.cardName)).setText(card.getDisplayText());
     }
 
-    @Override
-    public void onBackPressed() {
-        NavUtils.navigateUpFromSameTask(this);
-    }
+//    @Override
+//    public void onBackPressed() {
+//        NavUtils.navigateUpFromSameTask(this);
+//    }
 }

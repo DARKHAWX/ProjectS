@@ -1,5 +1,7 @@
 package com.darkhawx.language.project_s.Helpers;
 
+import android.util.Log;
+
 /**
  * JapaneseCharacter contains static functions to do various tests
  * on characters to determine if it is one of the various types of
@@ -15,6 +17,9 @@ package com.darkhawx.language.project_s.Helpers;
  * @see <a href="http://sourceforge.net/projects/kanjixml/">http://sourceforge.net/projects/kanjixml/</a>
  */
 public class JapaneseCharacter {
+
+    private final static char LONG_VOWEL = 'ー';
+    private final static String LONG_VOWEL_STR = "-";
 
     /**
      * Version information
@@ -125,7 +130,9 @@ public class JapaneseCharacter {
      * UPPERCASE if the input was Katakana.
      */
     public static String toRomaji(char c) {
-        if (isHiragana(c)) {
+        if (c == LONG_VOWEL) {
+            return LONG_VOWEL_STR;
+        } else if (isHiragana(c)) {
             return lookupRomaji(c);
         } else if (isKatakana(c)) {
             c = toHiragana(c);

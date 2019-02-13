@@ -22,8 +22,20 @@ public class ProjectSAPI {
         return false;
     }
 
+    public static LinkedHashMap<String, CardSet> getInstalledSets() {
+        return INSTALLED_CARD_SETS;
+    }
+
+    public static void setInstalledSets(LinkedHashMap<String, CardSet> sets) {
+        INSTALLED_CARD_SETS = sets;
+    }
+
     public static CardSet getCardSet(String name) {
         return INSTALLED_CARD_SETS.get(name);
+    }
+
+    public static int numInstalledSets() {
+        return INSTALLED_CARD_SETS.size();
     }
 
 

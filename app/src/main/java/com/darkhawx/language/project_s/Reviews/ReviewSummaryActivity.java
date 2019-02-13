@@ -3,6 +3,7 @@ package com.darkhawx.language.project_s.Reviews;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -97,6 +98,11 @@ public class ReviewSummaryActivity extends AppCompatActivity {
 
             incorrectListView.addView(button);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        NavUtils.navigateUpFromSameTask(this);
     }
 }
 

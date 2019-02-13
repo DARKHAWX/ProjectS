@@ -34,9 +34,9 @@ public class WaniKaniAPI {
         return "";
     }
 
-    static String getReviewIds(String apiKey) {
-        AsyncTask<String, Void, String> getSummaryTask = new RetrieveWaniKaniSummary().execute(apiKey);
-        String response = null;
+    static String[] getReviewIds(String apiKey) {
+        AsyncTask<String, Void, String> getSummaryTask = new RetrieveWaniKaniData().execute(apiKey, "reviews");
+        String response = "";
         try {
             response = getSummaryTask.get();
         } catch (InterruptedException e) {
@@ -45,20 +45,42 @@ public class WaniKaniAPI {
             e.printStackTrace();
         }
 
-        if (response != null && !(response.compareTo("") == 0)) {
-            Pattern p = Pattern.compile("\"review_subject_ids\":\\[([0-9,]*)]");
+        Log.d(WaniKaniAPI.class.getSimpleName(), response);
+
+        if (!(response.equals(""))) {
+            Pattern p = Pattern.compile("\"subject_id\":([0-9]+)");
             Matcher m = p.matcher(response);
 
+            String[] str = new String[m.groupCount()];
+
             if (m.find()) {
-                return m.group(1);
+                for (int j = 0; j < m.groupCount(); j++) {
+                    str[j] = m.group(j + 1);
+                }
             }
+
+            return str;
         }
 
-        return "";
+        return new String[0];
     }
 
-    static String getSubjectData(String apiKey, String ids) {
-        AsyncTask<String, Void, String> getSubjectTask = new RetrieveWaniKaniSubject().execute(apiKey, ids);
+    static String getSubjectIDData(String apiKey, String ids) {
+        AsyncTask<String, Void, String> getSubjectTask = new RetrieveWaniKaniData().execute(apiKey, "subjects?ids="+ids);
+        String subjectResponse = null;
+        try {
+            subjectResponse = getSubjectTask.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return subjectResponse;
+    }
+
+    static String getSubjectPageData(String apiKey, String pageAfterID) {
+        AsyncTask<String, Void, String> getSubjectTask = new RetrieveWaniKaniData().execute(apiKey, "subjects?page_after_id="+pageAfterID);
         String subjectResponse = null;
         try {
             subjectResponse = getSubjectTask.get();
@@ -73,6 +95,14 @@ public class WaniKaniAPI {
 
     static Card extractCardFromData(@NonNull String cardData) {
         Card currentCard;
+
+        /** Obtain Card id */
+        Pattern p_id = Pattern.compile("\"id\":([0-9]*)");
+        Matcher m_id = p_id.matcher(cardData);
+        int id = -1;
+        if (m_id.find()) {
+            id = Integer.valueOf(m_id.group(1));
+        }
 
         /** Obtain Card Type */
         Pattern p_obj = Pattern.compile("\"object\":\"([A-Za-z]*)\"");
@@ -143,6 +173,8 @@ public class WaniKaniAPI {
             }
         }
 
+        currentCard.setWaniKaniID(id);
+
         return currentCard;
     }
 
@@ -154,82 +186,33 @@ public class WaniKaniAPI {
           First need to split into each subject data. Then send through parser
          */
         //TODO FIX
-        String[] data = cardData.split(",");
+        Pattern p = Pattern.compile("(\\{\"id\":[0-9]*,\"object\":\"[a-z]*\",\"url\":\".*?\",\"data_updated_at\":\"[0-9\\-.:TZ]*\",\"data\":\\{.*?\\}\\}),?");
+        Matcher m = p.matcher(cardData);
 
-        for (int i = 0; i < data.length; i++) {
-            cards.add(extractCardFromData(data[i]));
-        }
-
-
-        return (Card[]) cards.toArray();
-    }
-}
-
-class RetrieveWaniKaniSummary extends AsyncTask<String, Void, String> {
-
-    protected String doInBackground(String... apiKey) {
-        String url = "https://www.wanikani.com/api/v2/summary";
-        String charset = "UTF-8";
-        String query = "";
-
-        HttpURLConnection connection;
-        try {
-            connection = (HttpURLConnection) new URL(url + query).openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-//        connection.setReadTimeout(10000);
-//        connection.setConnectTimeout(5000);
-        connection.setRequestProperty("Authorization", "Token token=" + apiKey[0]);
-        connection.setRequestProperty("Accept-Charset", charset);
-        try {
-            connection.setRequestMethod("GET");
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-            return null;
-        }
-        connection.setDoOutput(false);
-        InputStream response = null;
-        try {
-            int status = connection.getResponseCode();
-            //Log.d(InstalledCardSets.class.getSimpleName(), String.valueOf(status));
-            if (status >= 400 && status < 600) {
-                InputStream error = connection.getErrorStream();
-                Log.d(WaniKaniAPI.class.getSimpleName(), String.valueOf(error));
-            } else {
-                response = connection.getInputStream();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        String responseStr = "";
-        if (response != null) {
-            try (Scanner scanner = new Scanner(response)) {
-                responseStr = scanner.useDelimiter("\\A").next();
+        while (m.find()) {
+            Card card = extractCardFromData(m.group());
+            if (card != null) {
+                cards.add(card);
             }
         }
 
-        connection.disconnect();
-
-        return responseStr;
+        Card[] cardsArr = new Card[cards.size()];
+        return cards.toArray(cardsArr);
     }
 }
 
-class RetrieveWaniKaniSubject extends AsyncTask<String, Void, String> {
+class RetrieveWaniKaniData extends AsyncTask<String, Void, String> {
 
     protected String doInBackground(String... params) {
         if (params.length != 2) {
             try {
-                throw new Exception("RetrieveWaniKaniSubject: Invalid argument amount");
+                throw new Exception("RetrieveWaniKaniData: Invalid argument amount");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        String url = "https://www.wanikani.com/api/v2/subjects/?ids=";
+
+        String url = "https://www.wanikani.com/api/v2/";
         String charset = "UTF-8";
         String query = params[1];
 
@@ -266,8 +249,6 @@ class RetrieveWaniKaniSubject extends AsyncTask<String, Void, String> {
             e.printStackTrace();
             return null;
         }
-
-        //TODO Potentially convert to JSon array
 
         String responseStr = "";
         if (response != null) {
